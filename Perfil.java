@@ -1,68 +1,64 @@
 package Rede;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 public class Perfil {
-	String nome;
-	String login;
-	String senha;
+	private String nome;
+	private String login;
+	private String senha;
+	private List<Post> posts;
+	private int quantPosts = 0;
+	static Scanner sc = new Scanner(System.in);
 	
-	Post [] posts = new Post [100];
-	int quantPosts = 0;
-	Scanner sc = new Scanner(System.in);
+	public String getNome() {
+		return nome;
+	}
+
+	public void setNome(String nome) {
+		this.nome = nome;
+	}
+
+	public String getLogin() {
+		return login;
+	}
+
+	public List<Post> getPosts() {
+		return posts;
+	}
+	
+	public Perfil(String login, String nome, String senha) {
+		this.login = login;
+		this.nome = nome;
+		this.senha = senha;
+		this.posts = new ArrayList<>();
+	}
+	
+	public boolean confereSenha(String senhaInserida) {
+		return senhaInserida.equals(this.senha);
+	}
 	
 	public void novoPost() {
-		this.posts[quantPosts] = new Post();
-		insereData();
-		insereHora();
 		System.out.println("Insira o conteúdo.");
-		this.posts[quantPosts].texto = sc.nextLine();
+		String texto = sc.nextLine();
+		this.posts.add(new Post(texto, LocalDateTime.now()));
 		this.quantPosts++;
 		System.out.println("Postado com sucesso! \n");
-		RedeSocial.menuDoUsuario();
 	}
 	
 	public void verTimeline(){
 		if(quantPosts==0) {
 			System.out.println("Ainda não há posts! Poste para poder imprimir a timeline. \n");
 		}else {
-			for(int i=0 ; i<quantPosts ; i++) {
-				System.out.println(this.posts[i].data + " às " + this.posts[i].hora + " - " + this.posts[i].texto + "\n");
-			}
-		}
-		RedeSocial.menuDoUsuario();
-	}
-	
-	public void insereData() {
-		boolean dataCorreta = false;
-		while(!dataCorreta){
-			System.out.println("Insira a data (dd/mm/aaaa)");
-			this.posts[quantPosts].data = sc.nextLine();
-			DateTimeFormatter formatadorData = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-			try {
-				LocalDate inputDate = LocalDate.parse(this.posts[quantPosts].data, formatadorData);
-				dataCorreta=true;
-			} catch (Exception e) {
-				System.out.println("ERRO! Insira a data no formato correto!");
+			DateTimeFormatter formatadorData = DateTimeFormatter.ofPattern("dd/MM/yyyy 'às' HH:mm");
+			for(Post post : this.posts) {
+				System.out.println(post.getData().format(formatadorData)+ " \n " + post.getTexto() + "\n");
 			}
 		}
 	}
 	
-	public void insereHora() {
-		boolean horaCorreta=false;
-		while(!horaCorreta){
-			System.out.println("Insira a hora. (hh:mm)");
-			this.posts[quantPosts].hora = sc.nextLine();
-			DateTimeFormatter formatadorHora = DateTimeFormatter.ofPattern("HH:mm");
-			try {
-				LocalTime inputTime = LocalTime.parse(this.posts[quantPosts].hora, formatadorHora);
-				horaCorreta=true;
-			} catch (Exception e) {
-				System.out.println("ERRO! Insira a hora no formato correto!");
-			}
-		}
-	}
+	
 }
